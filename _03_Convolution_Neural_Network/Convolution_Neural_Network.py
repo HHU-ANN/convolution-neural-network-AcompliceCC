@@ -17,7 +17,7 @@ num_epochs = 50  # 50轮
 batch_size = 50  # 50步长
 learning_rate = 0.01  # 学习率0.01
 from torch.utils.data import DataLoader
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 def read_data():
     # 这里可自行修改数据预处理，batch大小也可自行调整
