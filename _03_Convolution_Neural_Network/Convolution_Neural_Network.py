@@ -1,10 +1,15 @@
 # 在该文件NeuralNetwork类中定义你的模型 
 # 在自己电脑上训练好模型，保存参数，在这里读取模型参数（不要使用JIT读取），在main中返回读取了模型参数的模型
 
+
 import os
 
 os.system("sudo pip3 install torch")
 os.system("sudo pip3 install torchvision")
+
+
+
+
 
 import torch
 import torch.nn as nn
@@ -12,12 +17,15 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-    
+print(torch.cuda.is_available())
+torch.cuda.current_device()
+torch.cuda._initialized = True
 num_epochs = 50  # 50轮
 batch_size = 50  # 50步长
 learning_rate = 0.01  # 学习率0.01
 from torch.utils.data import DataLoader
-device = torch.device('cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cpu')
 
 def read_data():
     # 这里可自行修改数据预处理，batch大小也可自行调整
@@ -98,54 +106,54 @@ class NeuralNetwork(nn.Module):
 
 model = NeuralNetwork(ResidualBlock, [2, 2, 2]).to(device)
 
-# # 损失函数
-# criterion = nn.CrossEntropyLoss()
-# optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-#
-# # 更新学习率
-# def update_lr(optimizer, lr):
-#         for param_group in optimizer.param_groups:
-#             param_group['lr'] = lr
-#
-# train_dataset, test_dataset, train_loader, test_loader = read_data()
-# # 训练数据集
-# total_step = len(train_loader)
-# curr_lr = learning_rate
-# for epoch in range(num_epochs):
-#     for i, (images, labels) in enumerate(train_loader):
-#         images = images.to(device)
-#         labels = labels.to(device)
-#
-#         # Forward pass
-#         outputs = model(images)
-#         loss = criterion(outputs, labels)
-#
-#         # Backward and optimize
-#         optimizer.zero_grad()
-#         loss.backward()
-#         optimizer.step()
-#
-#         if (i + 1) % 100 == 0:
-#             print("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
-#                     .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
-#
-#         # 延迟学习率
-#     if (epoch + 1) % 20 == 0:
-#         curr_lr /= 3
-#         update_lr(optimizer, curr_lr)
-#
-# torch.save(model.state_dict(), 'model.ckpt')
-# class NeuralNetwork(nn.Module):
-#     pass
+# 损失函数
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-# def read_data():
-#     # 这里可自行修改数据预处理，batch大小也可自行调整
-#     # 保持本地训练的数据读取和这里一致
-#     dataset_train = torchvision.datasets.CIFAR10(root='../data/exp03', train=True, download=True, transform=torchvision.transforms.ToTensor())
-#     dataset_val = torchvision.datasets.CIFAR10(root='../data/exp03', train=False, download=False, transform=torchvision.transforms.ToTensor())
-#     data_loader_train = DataLoader(dataset=dataset_train, batch_size=256, shuffle=True)
-#     data_loader_val = DataLoader(dataset=dataset_val, batch_size=256, shuffle=False)
-#     return dataset_train, dataset_val, data_loader_train, data_loader_val
+# 更新学习率
+def update_lr(optimizer, lr):
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+
+train_dataset, test_dataset, train_loader, test_loader = read_data()
+# 训练数据集
+total_step = len(train_loader)
+curr_lr = learning_rate
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader):
+        images = images.to(device)
+        labels = labels.to(device)
+
+        # Forward pass
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+
+        # Backward and optimize
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        if (i + 1) % 100 == 0:
+            print("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
+                    .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
+
+        # 延迟学习率
+    if (epoch + 1) % 20 == 0:
+        curr_lr /= 3
+        update_lr(optimizer, curr_lr)
+
+torch.save(model.state_dict(), 'model.ckpt')
+class NeuralNetwork(nn.Module):
+    pass
+
+def read_data():
+    # 这里可自行修改数据预处理，batch大小也可自行调整
+    # 保持本地训练的数据读取和这里一致
+    dataset_train = torchvision.datasets.CIFAR10(root='../data/exp03', train=True, download=True, transform=torchvision.transforms.ToTensor())
+    dataset_val = torchvision.datasets.CIFAR10(root='../data/exp03', train=False, download=False, transform=torchvision.transforms.ToTensor())
+    data_loader_train = DataLoader(dataset=dataset_train, batch_size=256, shuffle=True)
+    data_loader_val = DataLoader(dataset=dataset_val, batch_size=256, shuffle=False)
+    return dataset_train, dataset_val, data_loader_train, data_loader_val
 
 def main():
     model = NeuralNetwork(ResidualBlock, [2, 2, 2]).to(device) # 若有参数则传入参数
