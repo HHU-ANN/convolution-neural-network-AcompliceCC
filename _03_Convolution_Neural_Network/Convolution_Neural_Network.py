@@ -17,7 +17,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-num_epochs = 15  # 50轮
+num_epochs = 25  # 50轮
 batch_size = 50  # 50步长
 learning_rate = 0.01  # 学习率0.01
 from torch.utils.data import DataLoader
@@ -27,16 +27,21 @@ device = torch.device('cpu')
 def read_data():
     # 这里可自行修改数据预处理，batch大小也可自行调整
     # 保持本地训练的数据读取和这里一致
-    dataset_train=torchvision.datasets.CIFAR10(root='../data/exp03', train=True, download=True, transform=torchvision.transforms.ToTensor())
+    transform = transforms.Compose([
+        transforms.Pad(4),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomCrop(32),
+        transforms.ToTensor()])
+    dataset_train = torchvision.datasets.CIFAR10(root='../data/exp03', train=True, download=True, transform=torchvision.transforms.ToTensor())
     dataset_val = torchvision.datasets.CIFAR10(root='../data/exp03', train=False, download=False, transform=torchvision.transforms.ToTensor())
-    data_loader_train = DataLoader(dataset=dataset_train, batch_size=256, shuffle=True)
-    data_loader_val = DataLoader(dataset=dataset_val, batch_size=256, shuffle=False)
+    data_loader_train = DataLoader(dataset=dataset_train, batch_size=batch_size, shuffle=True)
+    data_loader_val = DataLoader(dataset=dataset_val, batch_size=batch_size, shuffle=False)
     return dataset_train, dataset_val, data_loader_train, data_loader_val
 
 # 3x3 卷积定义
 def conv3x3(in_channels, out_channels, stride=1):
     return nn.Conv2d(in_channels, out_channels, kernel_size=3,
-                     stride = stride, padding=1, bias=False)
+                     stride=stride, padding=1, bias=False)
 
    # Resnet 的残差块
 class ResidualBlock(nn.Module):
@@ -45,7 +50,7 @@ class ResidualBlock(nn.Module):
             self.conv1 = conv3x3(in_channels, out_channels, stride)
             self.bn1 = nn.BatchNorm2d(out_channels)
             self.relu = nn.ReLU(inplace=True)
-            self.conv2=conv3x3(out_channels, out_channels)
+            self.conv2 = conv3x3(out_channels, out_channels)
             self.bn2 = nn.BatchNorm2d(out_channels)
             self.downsample = downsample
 
