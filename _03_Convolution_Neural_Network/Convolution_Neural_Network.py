@@ -45,7 +45,7 @@ class ResidualBlock(nn.Module):
             self.conv1 = conv3x3(in_channels, out_channels, stride)
             self.bn1 = nn.BatchNorm2d(out_channels)
             self.relu = nn.ReLU(inplace=True)
-            self.conv2 = conv3x3(out_channels, out_channels)
+            self.conv2=conv3x3(out_channels, out_channels)
             self.bn2 = nn.BatchNorm2d(out_channels)
             self.downsample = downsample
 
