@@ -17,10 +17,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-print(torch.cuda.is_available())
-torch.cuda.current_device()
-torch.cuda._initialized = True
-num_epochs = 50  # 50轮
+num_epochs = 15  # 50轮
 batch_size = 50  # 50步长
 learning_rate = 0.01  # 学习率0.01
 from torch.utils.data import DataLoader
@@ -158,6 +155,6 @@ def main():
     model = NeuralNetwork(ResidualBlock, [2, 2, 2]).to(device) # 若有参数则传入参数
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
-    model.load_state_dict(torch.load(parent_dir + '/pth/model.pth',map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load(parent_dir + '/pth/model.pth'))
     return model
     
