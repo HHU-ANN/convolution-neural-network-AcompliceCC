@@ -24,8 +24,8 @@ num_epochs = 50  # 50轮
 batch_size = 50  # 50步长
 learning_rate = 0.01  # 学习率0.01
 from torch.utils.data import DataLoader
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-#device = torch.device('cpu')
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 
 def read_data():
     # 这里可自行修改数据预处理，batch大小也可自行调整
@@ -142,9 +142,8 @@ for epoch in range(num_epochs):
         curr_lr /= 3
         update_lr(optimizer, curr_lr)
 
-torch.save(model.state_dict(), 'model.ckpt')
-class NeuralNetwork(nn.Module):
-    pass
+torch.save(model.state_dict(), 'model.pth')
+
 
 def read_data():
     # 这里可自行修改数据预处理，batch大小也可自行调整
@@ -159,6 +158,6 @@ def main():
     model = NeuralNetwork(ResidualBlock, [2, 2, 2]).to(device) # 若有参数则传入参数
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
-    model.load_state_dict(torch.load(parent_dir + '/pth/model.pth'))
+    model.load_state_dict(torch.load(parent_dir + '/pth/model.pth',map_location=torch.device('cpu')))
     return model
     
